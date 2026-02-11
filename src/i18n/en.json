@@ -1,0 +1,69 @@
+{
+  "app": {
+    "title": "MD Analyzer"
+  },
+  "toolbar": {
+    "settings": "Settings",
+    "outputFolder": "Output folder",
+    "clearChat": "Clear chat",
+    "noFolderSelected": "No folder selected"
+  },
+  "files": {
+    "dropzone": "Drop .md files here or click to browse",
+    "dropzoneActive": "Drop files here...",
+    "title": "Files",
+    "clear": "Clear",
+    "empty": "No files loaded"
+  },
+  "command": {
+    "placeholder": "Enter command, e.g. \"Analyze errors\" or \"Generate improved document\"...",
+    "analyze": "Analyze",
+    "stop": "Stop",
+    "includeHistory": "Include previous conversation",
+    "noApiKey": "Set API key in settings"
+  },
+  "conversation": {
+    "title": "Conversation",
+    "empty": "Start a conversation - drop files and enter a command",
+    "save": "Save all",
+    "copy": "Copy",
+    "download": "Download",
+    "extractedDocs": "Extracted MD document ({{count}})",
+    "extractedDocs_plural": "Extracted MD documents ({{count}})"
+  },
+  "settings": {
+    "title": "Settings",
+    "apiKey": "Perplexity API Key",
+    "apiKeyPlaceholder": "pplx-...",
+    "model": "Model",
+    "temperature": "Temperature",
+    "language": "Language",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "outputFolder": {
+    "select": "Select output folder",
+    "current": "Current folder"
+  },
+  "messages": {
+    "fileSaved": "File saved: {{path}}",
+    "fileSaveError": "Error saving file",
+    "streamError": "Error during analysis",
+    "copied": "Copied to clipboard",
+    "settingsSaved": "Settings saved"
+  },
+  "queue": {
+    "toggle": "Toggle queue",
+    "add": "Queue",
+    "title": "Prompt queue",
+    "empty": "Queue is empty. Add prompts to execute them sequentially.",
+    "start": "Start",
+    "clear": "Clear",
+    "processing": "Processing...",
+    "cooldown": "Next in {{seconds}}s",
+    "includeHistory": "Include conversation",
+    "autoSave": "Auto-save",
+    "autoSaveNoFolder": "Select output folder to enable auto-save",
+    "fileProgress": "File {{current}} of {{total}}:"
+  }
+}

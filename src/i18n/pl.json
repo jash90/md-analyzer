@@ -1,0 +1,69 @@
+{
+  "app": {
+    "title": "MD Analyzer"
+  },
+  "toolbar": {
+    "settings": "Ustawienia",
+    "outputFolder": "Folder wyjściowy",
+    "clearChat": "Wyczyść czat",
+    "noFolderSelected": "Nie wybrano folderu"
+  },
+  "files": {
+    "dropzone": "Upuść pliki .md tutaj lub kliknij aby wybrać",
+    "dropzoneActive": "Upuść pliki tutaj...",
+    "title": "Pliki",
+    "clear": "Wyczyść",
+    "empty": "Brak załadowanych plików"
+  },
+  "command": {
+    "placeholder": "Wpisz polecenie, np. \"Przeanalizuj błędy\" lub \"Wygeneruj poprawiony dokument\"...",
+    "analyze": "Analizuj",
+    "stop": "Zatrzymaj",
+    "includeHistory": "Dołącz poprzednią rozmowę",
+    "noApiKey": "Ustaw klucz API w ustawieniach"
+  },
+  "conversation": {
+    "title": "Rozmowa",
+    "empty": "Rozpocznij rozmowę - wrzuć pliki i wpisz polecenie",
+    "save": "Zapisz całość",
+    "copy": "Kopiuj",
+    "download": "Pobierz",
+    "extractedDocs": "Wykryto dokument MD ({{count}})",
+    "extractedDocs_plural": "Wykryto dokumenty MD ({{count}})"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "apiKey": "Klucz API Perplexity",
+    "apiKeyPlaceholder": "pplx-...",
+    "model": "Model",
+    "temperature": "Temperatura",
+    "language": "Język",
+    "save": "Zapisz",
+    "cancel": "Anuluj"
+  },
+  "outputFolder": {
+    "select": "Wybierz folder wyjściowy",
+    "current": "Bieżący folder"
+  },
+  "messages": {
+    "fileSaved": "Plik zapisany: {{path}}",
+    "fileSaveError": "Błąd zapisu pliku",
+    "streamError": "Błąd podczas analizy",
+    "copied": "Skopiowano do schowka",
+    "settingsSaved": "Ustawienia zapisane"
+  },
+  "queue": {
+    "toggle": "Pokaż kolejkę",
+    "add": "Dodaj",
+    "title": "Kolejka poleceń",
+    "empty": "Kolejka jest pusta. Dodaj polecenia aby je sekwencyjnie wykonać.",
+    "start": "Uruchom",
+    "clear": "Wyczyść",
+    "processing": "Przetwarzanie...",
+    "cooldown": "Kolejny za {{seconds}}s",
+    "includeHistory": "Dołącz rozmowę",
+    "autoSave": "Auto-zapis",
+    "autoSaveNoFolder": "Wybierz folder wyjściowy aby włączyć auto-zapis",
+    "fileProgress": "Plik {{current}} z {{total}}:"
+  }
+}
