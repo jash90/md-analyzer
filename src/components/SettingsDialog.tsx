@@ -71,9 +71,10 @@ export function SettingsDialog() {
               className="w-full rounded-lg bg-zinc-800 border border-zinc-600 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-blue-500"
             >
               <option value="sonar">Sonar</option>
-              <option value="sonar-pro">Sonar Pro (200k context)</option>
+              <option value="sonar-pro">Sonar Pro</option>
               <option value="sonar-reasoning">Sonar Reasoning</option>
               <option value="sonar-reasoning-pro">Sonar Reasoning Pro</option>
+              <option value="sonar-deep-research">Sonar Deep Research</option>
             </select>
           </div>
 
