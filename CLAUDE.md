@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Prerequisites
+
+Node >= 22, Rust >= 1.93, Tauri CLI >= 2.10 (`@tauri-apps/cli` is in devDependencies — installed via `npm install`).
+
 ## Build & Dev Commands
 
 ```bash
@@ -9,13 +13,14 @@ npm run tauri dev          # Run full Tauri desktop app (frontend + Rust backend
 npm run dev                # Frontend-only dev server (http://localhost:1420)
 npm run build              # Production build (tsc + vite build)
 npm run preview            # Preview production build
+npx tsc --noEmit           # Type-check frontend only (no build)
 ```
 
 Rust backend builds automatically via Tauri when using `npm run tauri dev`. For Rust-only checks:
 
 ```bash
-cd src-tauri && cargo check    # Type-check Rust code
-cd src-tauri && cargo build    # Build Rust backend only
+cargo check --manifest-path src-tauri/Cargo.toml    # Type-check Rust code
+cargo build --manifest-path src-tauri/Cargo.toml    # Build Rust backend only
 ```
 
 No test suite or linter is configured.
@@ -39,9 +44,16 @@ The Perplexity integration uses Tauri's `Channel` for real-time token streaming:
 - Frontend buffers tokens via `requestAnimationFrame` (~10fps) to prevent UI freeze
 - `StreamEvent::Done(String)` finalizes the message; `StreamEvent::Error(String)` for failures
 
+### Three Operating Modes
+
+The app has three modes controlled by `settings.mode`:
+- **Files** (`files`): Load `.md` files via drag-drop, analyze them with prompts. Left panel shows file list + drop zone.
+- **Text** (`text`): Free-form chat with the Perplexity API. No files involved.
+- **List** (`list`): Define a list of items + optional template (e.g., `"Write about: {{element}}"`). Each item is processed individually. List items can be bulk-edited via `ListEditorModal`.
+
 ### State Management
 
-Single Zustand store (`src/store/appStore.ts`) holds all app state: loaded files, conversation messages, streaming state, settings, prompt queue, and UI flags. Settings are persisted to disk via `@tauri-apps/plugin-store`.
+Single Zustand store (`src/store/appStore.ts`) holds all app state: loaded files, conversation messages, streaming state, settings, prompt queue, list items, and UI flags. Settings are persisted to disk via `@tauri-apps/plugin-store` (`settings.json`).
 
 ### Prompt Queue System
 
@@ -71,7 +83,7 @@ Assistant responses can contain delimited markdown blocks (`==== filename.md ===
 - **Named exports** for all components; `React.memo()` on expensive components (e.g., `MessageBubble`)
 - **Rust errors** use `thiserror` crate with `AppError` enum implementing `Serialize` for Tauri IPC
 - **Tauri plugins:** dialog (native file picker), store (persistent settings), fs (file access), shell
-- **Perplexity models:** sonar, sonar-pro, sonar-reasoning, sonar-reasoning-pro
+- **Perplexity models:** sonar, sonar-pro, sonar-reasoning, sonar-reasoning-pro, sonar-deep-research
 - Vite dev server runs on port **1420** (strict), HMR on port **1421**
 
 ## Adding a New Tauri Command
@@ -82,10 +94,15 @@ Assistant responses can contain delimited markdown blocks (`==== filename.md ===
 4. Add TypeScript wrapper in `src/lib/commands.ts` using `invoke()`
 5. If using new plugin APIs, add permissions to `src-tauri/capabilities/default.json`
 
+## Message Building (`src/lib/markdown.ts`)
+
+System prompts vary by mode. In files mode, each loaded file is wrapped in a markdown fence and injected into the user message. History inclusion is opt-in and pairs user+assistant messages to prevent consecutive same-role messages. The `{{element}}` placeholder in list templates is replaced with the current list item content.
+
 ## Gotchas
 
 - **Tauri FS scope:** File operations are restricted to `$HOME`, `$DESKTOP`, `$DOCUMENT`, `$DOWNLOAD` paths. To access other paths, update `src-tauri/capabilities/default.json` `fs:scope`.
 - **Capability permissions:** New Tauri plugin APIs require explicit permissions in `src-tauri/capabilities/default.json`. Operations will silently fail without the right permission entry.
 - **StreamEvent serialization:** Rust enums serialize as tagged unions (`{ type: "Token", data: "..." }`) — match on `event.type` in TypeScript, not on string content.
 - **Store plugin init:** Uses Builder pattern (`.plugin(tauri_plugin_store::Builder::default().build())`), unlike other plugins that use `::init()`.
-- **No .gitignore:** This project currently has no `.gitignore` file.
+- **i18n dual files:** Every new translation key must be added to both `src/i18n/pl.json` and `src/i18n/en.json`. Missing keys render as raw key strings (e.g., `list.editor`) with no build-time warning.
+- **Modal pattern:** Modals use boolean state in Zustand (e.g., `listEditorOpen` / `setListEditorOpen`), render in `Layout.tsx` as siblings of `<SettingsDialog />`, and return `null` when closed. Follow `SettingsDialog.tsx` as the reference implementation.
