@@ -1,4 +1,4 @@
-import type { ChatMessage, MarkdownFile, DisplayMessage } from "../types";
+import type { ChatMessage, MarkdownFile, DisplayMessage, ListItem } from "../types";
 
 const SYSTEM_PROMPT = `You are an expert Markdown document analyzer and editor. You help users analyze, improve, and fix Markdown documents.
 
@@ -30,14 +30,30 @@ console.log("hello");
 
 Never use \`\`\`markdown fences to wrap entire output documents. Use the ==== delimiters instead.`;
 
+const TEXT_SYSTEM_PROMPT = `You are a helpful, knowledgeable assistant. Answer questions clearly and concisely. Always respond in the same language as the user's message.`;
+
+const LIST_SYSTEM_PROMPT = `You are a helpful, knowledgeable assistant processing individual items from a list. Each request contains one item to process. Provide a thorough, well-structured response for this specific item.
+
+When outputting a complete document, wrap it with special delimiters:
+- Start with a line: ==== filename.extension ====
+- Then the full document content
+- End with a line: ==== koniec ====
+
+Always respond in the same language as the user's message.`;
+
 export function buildMessages(
   command: string,
   files: MarkdownFile[],
   history: DisplayMessage[],
-  includeHistory: boolean
+  includeHistory: boolean,
+  mode: 'files' | 'text' | 'list' = 'files',
+  _listItem?: ListItem
 ): ChatMessage[] {
+  const systemPrompt = mode === 'list' ? LIST_SYSTEM_PROMPT : mode === 'text' ? TEXT_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  const effectiveFiles = (mode === 'text' || mode === 'list') ? [] : files;
+
   const messages: ChatMessage[] = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
   ];
 
   if (includeHistory && history.length > 0) {
@@ -59,8 +75,8 @@ export function buildMessages(
 
   let userContent = command;
 
-  if (files.length > 0) {
-    const filesSection = files
+  if (effectiveFiles.length > 0) {
+    const filesSection = effectiveFiles
       .map(
         (f) =>
           `\n---\n### File: ${f.name}\n\`\`\`markdown\n${f.content}\n\`\`\`\n`

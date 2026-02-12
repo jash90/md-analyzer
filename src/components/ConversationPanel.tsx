@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, FileText } from "lucide-react";
 import { useAppStore } from "../store/appStore";
 import { MessageBubble } from "./MessageBubble";
 import { StreamingBubble } from "./StreamingBubble";
@@ -16,6 +16,8 @@ export function ConversationPanel() {
   const messages = useAppStore((s) => s.messages);
   const isStreaming = useAppStore((s) => s.isStreaming);
   const cooldownSeconds = useAppStore((s) => s.cooldownSeconds);
+  const mode = useAppStore((s) => s.settings.mode);
+  const listProgress = useAppStore((s) => s.listProgress);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ export function ConversationPanel() {
     return (
       <div className="flex-1 flex flex-col items-center justify-center text-zinc-500 gap-3">
         <MessageSquare size={48} strokeWidth={1} />
-        <p className="text-sm">{t("conversation.empty")}</p>
+        <p className="text-sm">{t(mode === 'list' ? "conversation.emptyList" : mode === 'text' ? "conversation.emptyText" : "conversation.empty")}</p>
       </div>
     );
   }
@@ -63,6 +65,16 @@ export function ConversationPanel() {
       ))}
 
       {isStreaming && <StreamingContent />}
+
+      {listProgress && (
+        <div className="mb-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+          <FileText size={12} className="text-blue-400 shrink-0" />
+          <span className="text-xs text-blue-300">
+            {t("list.progress", { current: listProgress.current, total: listProgress.total })}
+          </span>
+          <span className="text-xs text-zinc-400 truncate">{listProgress.itemContent}</span>
+        </div>
+      )}
 
       {cooldownSeconds > 0 && <CooldownBar seconds={cooldownSeconds} />}
 

@@ -17,14 +17,24 @@
   },
   "command": {
     "placeholder": "Wpisz polecenie, np. \"Przeanalizuj błędy\" lub \"Wygeneruj poprawiony dokument\"...",
+    "placeholderText": "Wpisz wiadomość...",
     "analyze": "Analizuj",
+    "send": "Wyślij",
     "stop": "Zatrzymaj",
     "includeHistory": "Dołącz poprzednią rozmowę",
-    "noApiKey": "Ustaw klucz API w ustawieniach"
+    "noApiKey": "Ustaw klucz API w ustawieniach",
+    "modeFiles": "Pliki MD",
+    "modeText": "Tekst",
+    "modeList": "Lista",
+    "generate": "Generuj",
+    "templatePlaceholder": "Opcjonalny szablon, np. \"Napisz artykuł o: {{element}}\"...",
+    "listItemPlaceholder": "Wpisz element listy..."
   },
   "conversation": {
     "title": "Rozmowa",
     "empty": "Rozpocznij rozmowę - wrzuć pliki i wpisz polecenie",
+    "emptyText": "Rozpocznij rozmowę - wpisz wiadomość",
+    "emptyList": "Dodaj elementy do listy i kliknij Generuj",
     "save": "Zapisz całość",
     "copy": "Kopiuj",
     "download": "Pobierz",
@@ -65,5 +75,23 @@
     "autoSave": "Auto-zapis",
     "autoSaveNoFolder": "Wybierz folder wyjściowy aby włączyć auto-zapis",
     "fileProgress": "Plik {{current}} z {{total}}:"
+  },
+  "list": {
+    "title": "Elementy listy",
+    "empty": "Brak elementów. Dodaj elementy powyżej.",
+    "clear": "Wyczyść listę",
+    "progress": "Element {{current}} z {{total}}:",
+    "autoSave": "Auto-zapis plików",
+    "import": "Importuj",
+    "imported": "Zaimportowano {{count}} elementów",
+    "importEmpty": "Plik nie zawiera żadnych elementów",
+    "editor": "Edytuj",
+    "editorTitle": "Edytor listy",
+    "bulkEdit": "Edycja masowa",
+    "bulkEditHint": "Jeden element na linię",
+    "apply": "Zastosuj",
+    "close": "Zamknij",
+    "moveUp": "Przesuń w górę",
+    "moveDown": "Przesuń w dół"
   }
 }

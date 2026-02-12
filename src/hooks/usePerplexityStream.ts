@@ -9,6 +9,17 @@ import { useTranslation } from "react-i18next";
 
 const API_DELAY_MS = 20_000;
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60) || 'item';
+}
+
 export function usePerplexityStream() {
   const { t } = useTranslation();
   const abortRef = useRef(false);
@@ -48,7 +59,7 @@ export function usePerplexityStream() {
   }, []);
 
   const executeSinglePrompt = useCallback(
-    async (command: string, includeHistory: boolean, filesOverride?: MarkdownFile[], messagesOverride?: DisplayMessage[]): Promise<string | null> => {
+    async (command: string, includeHistory: boolean, filesOverride?: MarkdownFile[], messagesOverride?: DisplayMessage[], associatedListItem?: string): Promise<string | null> => {
       const store = useAppStore.getState();
       const { settings, files, messages } = store;
 
@@ -65,6 +76,7 @@ export function usePerplexityStream() {
         content: command,
         timestamp: Date.now(),
         ...(associatedFile && { associatedFile }),
+        ...(associatedListItem && { associatedListItem }),
       });
 
       store.setIsStreaming(true);
@@ -77,7 +89,8 @@ export function usePerplexityStream() {
         command,
         filesToUse,
         historyMessages,
-        includeHistory
+        includeHistory,
+        settings.mode
       );
 
       const totalChars = chatMessages.reduce((sum, m) => sum + m.content.length, 0);
@@ -123,7 +136,7 @@ export function usePerplexityStream() {
                     useAppStore.getState().appendStreamToken(tokenBufferRef.current);
                     tokenBufferRef.current = "";
                   }
-                  useAppStore.getState().finalizeAssistantMessage(event.data, associatedFile);
+                  useAppStore.getState().finalizeAssistantMessage(event.data, associatedFile, associatedListItem);
                   resolve(event.data);
                   break;
                 case "Error":
@@ -174,9 +187,9 @@ export function usePerplexityStream() {
   const send = useCallback(
     async (command: string) => {
       const store = useAppStore.getState();
-      const { files, includeHistory } = store;
+      const { files, includeHistory, settings } = store;
 
-      if (files.length <= 1) {
+      if (settings.mode === 'text' || files.length <= 1) {
         const content = await executeSinglePrompt(command, includeHistory);
         if (content) await autoSaveContent(content);
         return;
@@ -229,11 +242,12 @@ export function usePerplexityStream() {
     // Snapshot kolejki — oryginał zostaje w store (użytkownik czyści ręcznie)
     const prompts = [...store.promptQueue];
 
-    const { files } = store;
+    const { files, settings } = store;
+    const effectiveFiles = settings.mode === 'text' ? [] : files;
 
     console.log("[processQueue] START", {
       promptsCount: prompts.length,
-      filesCount: files.length,
+      filesCount: effectiveFiles.length,
       prompts: prompts.map((p, idx) => ({ idx, command: p.command.slice(0, 80), includeHistory: p.includeHistory })),
       files: files.map((f, idx) => ({ idx, name: f.name, path: f.path })),
     });
@@ -241,7 +255,7 @@ export function usePerplexityStream() {
     let iteration = 0;
 
     try {
-      if (files.length <= 1) {
+      if (effectiveFiles.length <= 1) {
         // 0-1 plików — prosty tryb: prompt po prompcie
         let first = true;
         for (const prompt of prompts) {
@@ -266,15 +280,15 @@ export function usePerplexityStream() {
       } else {
         // 2+ plików — plik po pliku: wszystkie prompty dla jednego pliku, potem następny
         let first = true;
-        for (let i = 0; i < files.length; i++) {
+        for (let i = 0; i < effectiveFiles.length; i++) {
           useAppStore.getState().setFileProgress({
             current: i + 1,
-            total: files.length,
-            fileName: files[i].name,
+            total: effectiveFiles.length,
+            fileName: effectiveFiles[i].name,
           });
           for (let j = 0; j < prompts.length; j++) {
             iteration++;
-            console.log(`[processQueue] iteration=${iteration}, file[${i}]="${files[i]?.name}", prompt[${j}]="${prompts[j]?.command.slice(0, 60)}", aborted=${queueAbortRef.current}`);
+            console.log(`[processQueue] iteration=${iteration}, file[${i}]="${effectiveFiles[i]?.name}", prompt[${j}]="${prompts[j]?.command.slice(0, 60)}", aborted=${queueAbortRef.current}`);
             if (queueAbortRef.current) break;
             if (!first) {
               console.log(`[processQueue] iteration=${iteration} — cooldown start`);
@@ -285,11 +299,11 @@ export function usePerplexityStream() {
             first = false;
 
             const fileMessages = useAppStore.getState().messages.filter(
-              (m) => m.associatedFile === files[i].path
+              (m) => m.associatedFile === effectiveFiles[i].path
             );
             console.log(`[processQueue] iteration=${iteration} — executeSinglePrompt START, fileMessages=${fileMessages.length}`);
             const content = await executeSinglePrompt(
-              prompts[j].command, prompts[j].includeHistory, [files[i]], fileMessages
+              prompts[j].command, prompts[j].includeHistory, [effectiveFiles[i]], fileMessages
             );
             console.log(`[processQueue] iteration=${iteration} — executeSinglePrompt END, hasContent=${!!content}, contentLength=${content?.length ?? 0}`);
             if (content) {
@@ -303,7 +317,7 @@ export function usePerplexityStream() {
     } catch (err) {
       console.error(`[processQueue] CRASH at iteration=${iteration}`, {
         error: err,
-        filesCount: files.length,
+        filesCount: effectiveFiles.length,
         promptsCount: prompts.length,
         aborted: queueAbortRef.current,
         storeState: {
@@ -329,8 +343,83 @@ export function usePerplexityStream() {
       state.setIsStreaming(false);
     }
     state.setFileProgress(null);
+    state.setListProgress(null);
     state.setIsProcessingQueue(false);
   }, []);
 
-  return { send, stop, processQueue, stopQueue };
+  const processListItems = useCallback(async () => {
+    const store = useAppStore.getState();
+    const { listItems, listTemplate, settings } = store;
+
+    if (store.isProcessingQueue || listItems.length === 0) return;
+    if (!settings.apiKey) {
+      toast.error(t("command.noApiKey"));
+      return;
+    }
+
+    store.setIsProcessingQueue(true);
+    queueAbortRef.current = false;
+
+    const usedSlugs = new Map<string, number>();
+
+    try {
+      for (let i = 0; i < listItems.length; i++) {
+        if (queueAbortRef.current) break;
+
+        const item = listItems[i];
+        useAppStore.getState().setListProgress({
+          current: i + 1,
+          total: listItems.length,
+          itemContent: item.content,
+        });
+
+        if (i > 0) await cooldownWithCountdown(queueAbortRef);
+        if (queueAbortRef.current) break;
+
+        // Build command from template + item
+        let command: string;
+        if (listTemplate && listTemplate.includes('{{element}}')) {
+          command = listTemplate.replace(/\{\{element\}\}/g, item.content);
+        } else if (listTemplate.trim()) {
+          command = `${listTemplate}\n\n${item.content}`;
+        } else {
+          command = item.content;
+        }
+
+        // Filter messages for this specific list item
+        const itemMessages = useAppStore.getState().messages.filter(
+          (m) => m.associatedListItem === item.id
+        );
+
+        const content = await executeSinglePrompt(command, false, [], itemMessages, item.id);
+
+        if (content) {
+          const { autoSaveFiles, outputFolderPath } = useAppStore.getState();
+          if (autoSaveFiles && outputFolderPath) {
+            let slug = slugify(item.content);
+            const count = (usedSlugs.get(slug) ?? 0) + 1;
+            usedSlugs.set(slug, count);
+            if (count > 1) slug = `${slug}-${count}`;
+            const fileName = `${slug}.md`;
+
+            try {
+              const path = await saveMarkdownFile(outputFolderPath, fileName, content);
+              toast.success(t("messages.fileSaved", { path }));
+            } catch {
+              toast.error(t("messages.fileSaveError"));
+            }
+          }
+        }
+
+        if (queueAbortRef.current) break;
+      }
+    } catch (err) {
+      console.error("[processListItems] Error:", err);
+    }
+
+    useAppStore.getState().setListProgress(null);
+    useAppStore.getState().setIsProcessingQueue(false);
+  }, [executeSinglePrompt, cooldownWithCountdown, t]);
+
+  return { send, stop, processQueue, stopQueue, processListItems };
 }

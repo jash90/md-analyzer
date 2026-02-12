@@ -15,6 +15,7 @@ export interface DisplayMessage {
   content: string;
   timestamp: number;
   associatedFile?: string;
+  associatedListItem?: string;
 }
 
 export type StreamEvent =
@@ -28,9 +29,15 @@ export interface QueuedPrompt {
   includeHistory: boolean;
 }
 
+export interface ListItem {
+  id: string;
+  content: string;
+}
+
 export interface AppSettings {
   apiKey: string;
   model: string;
   language: string;
   temperature: number;
+  mode: 'files' | 'text' | 'list';
 }

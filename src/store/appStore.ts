@@ -4,6 +4,7 @@ import type {
   DisplayMessage,
   AppSettings,
   QueuedPrompt,
+  ListItem,
 } from "../types";
 
 interface AppState {
@@ -20,6 +21,10 @@ interface AppState {
   cooldownSeconds: number;
   autoSaveFiles: boolean;
   fileProgress: { current: number; total: number; fileName: string } | null;
+  listItems: ListItem[];
+  listTemplate: string;
+  listProgress: { current: number; total: number; itemContent: string } | null;
+  listEditorOpen: boolean;
 
   addFiles: (files: MarkdownFile[]) => void;
   removeFile: (path: string) => void;
@@ -30,7 +35,7 @@ interface AppState {
   setIsStreaming: (v: boolean) => void;
   appendStreamToken: (token: string) => void;
   resetStreamingContent: () => void;
-  finalizeAssistantMessage: (content: string, associatedFile?: string) => void;
+  finalizeAssistantMessage: (content: string, associatedFile?: string, associatedListItem?: string) => void;
   setOutputFolderPath: (path: string) => void;
   setIncludeHistory: (v: boolean) => void;
   setSettingsOpen: (v: boolean) => void;
@@ -41,6 +46,15 @@ interface AppState {
   setCooldownSeconds: (v: number) => void;
   setAutoSaveFiles: (v: boolean) => void;
   setFileProgress: (v: { current: number; total: number; fileName: string } | null) => void;
+  addListItem: (content: string) => void;
+  addListItems: (contents: string[]) => void;
+  removeListItem: (id: string) => void;
+  editListItem: (id: string, content: string) => void;
+  clearListItems: () => void;
+  reorderListItems: (items: ListItem[]) => void;
+  setListTemplate: (v: string) => void;
+  setListProgress: (v: { current: number; total: number; itemContent: string } | null) => void;
+  setListEditorOpen: (v: boolean) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -51,6 +65,7 @@ export const useAppStore = create<AppState>((set) => ({
     model: "sonar",
     language: "pl",
     temperature: 0.7,
+    mode: "files",
   },
   isStreaming: false,
   streamingContent: "",
@@ -62,6 +77,10 @@ export const useAppStore = create<AppState>((set) => ({
   cooldownSeconds: 0,
   autoSaveFiles: false,
   fileProgress: null,
+  listItems: [],
+  listTemplate: "",
+  listProgress: null,
+  listEditorOpen: false,
 
   addFiles: (newFiles) =>
     set((state) => {
@@ -83,7 +102,7 @@ export const useAppStore = create<AppState>((set) => ({
   appendStreamToken: (token) =>
     set((state) => ({ streamingContent: state.streamingContent + token })),
   resetStreamingContent: () => set({ streamingContent: "" }),
-  finalizeAssistantMessage: (content, associatedFile) =>
+  finalizeAssistantMessage: (content, associatedFile, associatedListItem) =>
     set((state) => ({
       messages: [
         ...state.messages,
@@ -93,6 +112,7 @@ export const useAppStore = create<AppState>((set) => ({
           content,
           timestamp: Date.now(),
           ...(associatedFile && { associatedFile }),
+          ...(associatedListItem && { associatedListItem }),
         },
       ],
       streamingContent: "",
@@ -119,4 +139,30 @@ export const useAppStore = create<AppState>((set) => ({
   setCooldownSeconds: (v) => set({ cooldownSeconds: v }),
   setAutoSaveFiles: (v) => set({ autoSaveFiles: v }),
   setFileProgress: (v) => set({ fileProgress: v }),
+  addListItem: (content) =>
+    set((state) => ({
+      listItems: [...state.listItems, { id: crypto.randomUUID(), content }],
+    })),
+  addListItems: (contents) =>
+    set((state) => ({
+      listItems: [
+        ...state.listItems,
+        ...contents.map((c) => ({ id: crypto.randomUUID(), content: c })),
+      ],
+    })),
+  removeListItem: (id) =>
+    set((state) => ({
+      listItems: state.listItems.filter((item) => item.id !== id),
+    })),
+  editListItem: (id, content) =>
+    set((state) => ({
+      listItems: state.listItems.map((item) =>
+        item.id === id ? { ...item, content } : item
+      ),
+    })),
+  clearListItems: () => set({ listItems: [] }),
+  reorderListItems: (items) => set({ listItems: items }),
+  setListTemplate: (v) => set({ listTemplate: v }),
+  setListProgress: (v) => set({ listProgress: v }),
+  setListEditorOpen: (v) => set({ listEditorOpen: v }),
 }));

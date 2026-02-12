@@ -17,14 +17,24 @@
   },
   "command": {
     "placeholder": "Enter command, e.g. \"Analyze errors\" or \"Generate improved document\"...",
+    "placeholderText": "Type a message...",
     "analyze": "Analyze",
+    "send": "Send",
     "stop": "Stop",
     "includeHistory": "Include previous conversation",
-    "noApiKey": "Set API key in settings"
+    "noApiKey": "Set API key in settings",
+    "modeFiles": "MD Files",
+    "modeText": "Text",
+    "modeList": "List",
+    "generate": "Generate",
+    "templatePlaceholder": "Optional template, e.g. \"Write an article about: {{element}}\"...",
+    "listItemPlaceholder": "Enter list item..."
   },
   "conversation": {
     "title": "Conversation",
     "empty": "Start a conversation - drop files and enter a command",
+    "emptyText": "Start a conversation - type a message",
+    "emptyList": "Add items to the list and click Generate",
     "save": "Save all",
     "copy": "Copy",
     "download": "Download",
@@ -65,5 +75,23 @@
     "autoSave": "Auto-save",
     "autoSaveNoFolder": "Select output folder to enable auto-save",
     "fileProgress": "File {{current}} of {{total}}:"
+  },
+  "list": {
+    "title": "List items",
+    "empty": "No items. Add items above.",
+    "clear": "Clear list",
+    "progress": "Item {{current}} of {{total}}:",
+    "autoSave": "Auto-save files",
+    "import": "Import",
+    "imported": "Imported {{count}} items",
+    "importEmpty": "File contains no items",
+    "editor": "Edit",
+    "editorTitle": "List editor",
+    "bulkEdit": "Bulk edit",
+    "bulkEditHint": "One item per line",
+    "apply": "Apply",
+    "close": "Close",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   }
 }
