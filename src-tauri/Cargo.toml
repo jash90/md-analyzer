@@ -1,6 +1,6 @@
 [package]
 name = "md-analyzer"
-version = "0.1.0"
+version = "0.2.0"
 description = "MD Analyzer - Analyze and improve Markdown documents with Perplexity API"
 authors = ["you"]
 edition = "2021"

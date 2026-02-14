@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicedoc/tauri-2/main/tooling/schema/src-tauri/tauri.conf.json",
   "productName": "MD Analyzer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "identifier": "com.mdanalyzer.app",
   "build": {
     "beforeDevCommand": "npm run dev",
