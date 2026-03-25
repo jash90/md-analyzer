@@ -8,18 +8,21 @@ Get the latest release for your platform:
 
 | Platform | Download |
 |----------|----------|
-| **macOS** (Apple Silicon) | [MD.Analyzer_0.1.0_aarch64.dmg](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.1.0_aarch64.dmg) |
-| **macOS** (Intel) | [MD.Analyzer_0.1.0_x64.dmg](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.1.0_x64.dmg) |
-| **Windows** (MSI) | [MD.Analyzer_0.1.0_x64_en-US.msi](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.1.0_x64_en-US.msi) |
-| **Windows** (EXE) | [MD.Analyzer_0.1.0_x64-setup.exe](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.1.0_x64-setup.exe) |
-| **Linux** (Debian) | [MD.Analyzer_0.1.0_amd64.deb](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.1.0_amd64.deb) |
-| **Linux** (AppImage) | [MD.Analyzer_0.1.0_amd64.AppImage](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.1.0_amd64.AppImage) |
-| **Linux** (RPM) | [MD.Analyzer-0.1.0-1.x86_64.rpm](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer-0.1.0-1.x86_64.rpm) |
+| **macOS** (Apple Silicon) | [MD.Analyzer_0.2.0_aarch64.dmg](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.2.0_aarch64.dmg) |
+| **macOS** (Intel) | [MD.Analyzer_0.2.0_x64.dmg](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.2.0_x64.dmg) |
+| **Windows** (MSI) | [MD.Analyzer_0.2.0_x64_en-US.msi](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.2.0_x64_en-US.msi) |
+| **Windows** (EXE) | [MD.Analyzer_0.2.0_x64-setup.exe](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.2.0_x64-setup.exe) |
+| **Linux** (Debian) | [MD.Analyzer_0.2.0_amd64.deb](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.2.0_amd64.deb) |
+| **Linux** (AppImage) | [MD.Analyzer_0.2.0_amd64.AppImage](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer_0.2.0_amd64.AppImage) |
+| **Linux** (RPM) | [MD.Analyzer-0.2.0-1.x86_64.rpm](https://github.com/jash90/md-analyzer/releases/latest/download/MD.Analyzer-0.2.0-1.x86_64.rpm) |
 
 ## Features
 
-- **AI-Powered Analysis** — Send markdown files to Perplexity AI (sonar, sonar-pro, sonar-reasoning, sonar-reasoning-pro) with custom prompts
-- **Multi-File Processing** — Load multiple `.md` files via drag-and-drop or file picker, analyze them in batch
+- **Three Operating Modes:**
+  - **Files** — Load `.md` files via drag-and-drop or file picker, analyze them with AI prompts
+  - **Text** — Free-form chat with the Perplexity API without files
+  - **List** — Define a list of items with an optional template (e.g., `"Write about: {{element}}"`), each item processed individually
+- **AI-Powered Analysis** — Perplexity AI models: sonar, sonar-pro, sonar-reasoning, sonar-reasoning-pro, sonar-deep-research
 - **Real-Time Streaming** — Token-by-token streaming of AI responses with smooth UI updates
 - **Prompt Queue** — Queue multiple prompts and run them sequentially with 20-second cooldown between API calls
 - **Document Extraction** — AI responses containing delimited markdown blocks are automatically parsed for individual download or auto-save
@@ -36,8 +39,8 @@ Get the latest release for your platform:
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (LTS)
-- [Rust](https://www.rust-lang.org/tools/install) (stable)
+- [Node.js](https://nodejs.org/) >= 22
+- [Rust](https://www.rust-lang.org/tools/install) >= 1.93
 - Platform-specific dependencies for [Tauri](https://v2.tauri.app/start/prerequisites/)
 
 ### Commands
